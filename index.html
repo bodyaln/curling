@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="sk">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Curlingový prototyp na Matter.js</title>
+        <link rel="stylesheet" href="/src/style.css" />
+    </head>
+    <body>
+        <div class="app-shell">
+            <header class="topbar">
+                <h1>Curlingový prototyp</h1>
+            </header>
+            <div class="lobby-overlay" id="lobby-overlay">
+                <div class="lobby-card">
+                    <div
+                        class="lobby-screen lobby-enter"
+                        id="lobby-enter-screen"
+                    >
+                        <h2>Vstup do lobby</h2>
+                        <form id="lobby-form">
+                            <input
+                                id="nickname-input"
+                                type="text"
+                                placeholder="Zadajte svoje meno"
+                                required
+                            />
+                            <button type="submit">Vstúpiť</button>
+                        </form>
+                        <div class="lobby-status" id="lobby-status">
+                            Zadajte svoje meno a kliknite Vstúpiť.
+                        </div>
+                    </div>
+                    <div
+                        class="lobby-screen lobby-menu"
+                        id="lobby-menu-screen"
+                        hidden
+                    >
+                        <h2>Hlavné menu</h2>
+                        <div class="player-list" id="player-list">
+                            <p>Hráč <span id="menu-player-1"></span></p>
+                            <p>Hráč <span id="menu-player-2"></span></p>
+                        </div>
+                        <div class="menu-actions">
+                            <button
+                                id="start-game-button"
+                                type="button"
+                                style="background-color: rgb(3, 96, 26)"
+                            >
+                                Spustiť hru
+                            </button>
+                            <button
+                                id="show-rules-button"
+                                type="button"
+                                style="background-color: rgb(85, 79, 19)"
+                            >
+                                Zobraziť pravidlá
+                            </button>
+                            <button
+                                id="disconnect-button"
+                                type="button"
+                                style="background-color: rgb(166, 0, 0)"
+                            >
+                                Ukončiť pripojenie
+                            </button>
+                        </div>
+                    </div>
+                    <div
+                        class="lobby-screen lobby-rules"
+                        id="lobby-rules-screen"
+                        hidden
+                    >
+                        <h2>Pravidlá hry</h2>
+                        <div class="rules-text">
+                            <p>
+                                Hráči striedavo hádžu kamene po ľade smerom k
+                                cieľu.
+                            </p>
+                            <p>
+                                Cieľom je umiestniť čo najviac kameňov bližšie k
+                                stredu ako súper.
+                            </p>
+                            <p>
+                                V tejto verzii sa hrá s obmedzeným počtom
+                                kameňov a bez metenia.
+                            </p>
+                        </div>
+                        <div class="menu-actions">
+                            <button id="back-to-menu-button" type="button">
+                                Späť
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div
+                class="lobby-overlay config-overlay"
+                id="config-overlay"
+                hidden
+            >
+                <div class="config-screen-card" id="lobby-config-screen">
+                    <h2>Nastavenia hry</h2>
+                    <div class="config-topbar">
+                        <div>
+                            <button id="import-json-button" type="button">
+                                Importovať JSON
+                            </button>
+                            <input
+                                id="json-file-input"
+                                type="file"
+                                accept="application/json"
+                                hidden
+                            />
+                        </div>
+                    </div>
+                    <div class="config-layout">
+                        <div class="config-left">
+                            <div class="config-group" data-config-group="field">
+                                <h3>Pole</h3>
+                                <label>
+                                    Šírka
+                                    <p>
+                                        Hodnota:
+                                        <span id="field-width-value">800</span>
+                                    </p>
+                                    <input
+                                        id="field-width"
+                                        type="range"
+                                        min="320"
+                                        max="2500"
+                                        step="10"
+                                        value="800"
+                                    />
+                                </label>
+                                <label>
+                                    Výška
+                                    <p>
+                                        Hodnota:
+                                        <span id="field-height-value">350</span>
+                                    </p>
+                                    <input
+                                        id="field-height"
+                                        type="range"
+                                        min="320"
+                                        max="1500"
+                                        step="10"
+                                        value="350"
+                                    />
+                                </label>
+                            </div>
+                            <div
+                                class="config-group"
+                                data-config-group="target"
+                            >
+                                <h3>Cieľ</h3>
+                                <label>
+                                    X
+                                    <p>
+                                        Hodnota:
+                                        <span id="target-x-value">500</span>
+                                    </p>
+                                    <input
+                                        id="target-x"
+                                        type="range"
+                                        min="0"
+                                        max="2490"
+                                        step="10"
+                                        value="500"
+                                    />
+                                </label>
+                                <label>
+                                    Y
+                                    <p>
+                                        Hodnota:
+                                        <span id="target-y-value">200</span>
+                                    </p>
+                                    <input
+                                        id="target-y"
+                                        type="range"
+                                        min="0"
+                                        max="1490"
+                                        step="10"
+                                        value="200"
+                                    />
+                                </label>
+                                <label>
+                                    Polomer
+                                    <p>
+                                        Hodnota:
+                                        <span id="target-radius-value">70</span>
+                                    </p>
+                                    <input
+                                        id="target-radius"
+                                        type="range"
+                                        min="2"
+                                        max="120"
+                                        step="2"
+                                        value="70"
+                                    />
+                                </label>
+                            </div>
+                            <div class="config-group">
+                                <h3>Kamene</h3>
+                                <label>
+                                    Počet na hráča
+                                    <p>
+                                        Hodnota:
+                                        <span id="stones-per-player-value"
+                                            >2</span
+                                        >
+                                    </p>
+                                    <input
+                                        id="stones-per-player"
+                                        type="range"
+                                        min="1"
+                                        max="10"
+                                        step="1"
+                                        value="2"
+                                    />
+                                </label>
+                            </div>
+
+                            <div
+                                class="config-group"
+                                data-config-group="colors"
+                            >
+                                <h3>Farby</h3>
+                                <label>
+                                    Hráč <span id="color-player-a-name"></span>
+                                    <input
+                                        id="color-player-a"
+                                        type="color"
+                                        value="#f96660"
+                                    />
+                                </label>
+                                <label>
+                                    Hráč <span id="color-player-b-name"></span>
+                                    <input
+                                        id="color-player-b"
+                                        type="color"
+                                        value="#5d9cec"
+                                    />
+                                </label>
+                            </div>
+                            <div class="config-group">
+                                <h3>Prvý ťah</h3>
+                                <label class="radio-label">
+                                    <input
+                                        id="first-player-a"
+                                        type="radio"
+                                        name="first-player"
+                                        value="A"
+                                        checked
+                                    />
+                                    Hráč <span id="first-player-a-name"></span>
+                                </label>
+                                <label class="radio-label">
+                                    <input
+                                        id="first-player-b"
+                                        type="radio"
+                                        name="first-player"
+                                        value="B"
+                                    />
+                                    Hráč <span id="first-player-b-name"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="config-right">
+                            <div class="config-group">
+                                <h3>Kameň</h3>
+                                <label>
+                                    Polomer kameňa
+                                    <p>
+                                        Hodnota:
+                                        <span id="stone-radius-value">16</span>
+                                    </p>
+                                    <input
+                                        id="stone-radius"
+                                        type="range"
+                                        min="2"
+                                        max="40"
+                                        step="1"
+                                        value="16"
+                                    />
+                                </label>
+                                <label>
+                                    Štart X
+                                    <p>
+                                        Hodnota:
+                                        <span id="stone-base-x-value">120</span>
+                                    </p>
+                                    <input
+                                        id="stone-base-x"
+                                        type="range"
+                                        min="0"
+                                        max="2490"
+                                        step="10"
+                                        value="120"
+                                    />
+                                </label>
+                                <label>
+                                    Štart Y
+                                    <p>
+                                        Hodnota:
+                                        <span id="stone-row-y-value">175</span>
+                                    </p>
+                                    <input
+                                        id="stone-row-y"
+                                        type="range"
+                                        min="0"
+                                        max="1490"
+                                        step="10"
+                                        value="175"
+                                    />
+                                </label>
+                                <label>
+                                    Sila
+                                    <p>
+                                        Hodnota:
+                                        <span id="stone-power-multiplier-value"
+                                            >16</span
+                                        >
+                                    </p>
+                                    <input
+                                        id="stone-power-multiplier"
+                                        type="range"
+                                        min="2"
+                                        max="80"
+                                        step="1"
+                                        value="16"
+                                    />
+                                </label>
+                            </div>
+                            <div class="config-group">
+                                <h3>Fyzika</h3>
+                                <label>
+                                    Odskok
+                                    <p>
+                                        Hodnota:
+                                        <span id="physics-restitution-value"
+                                            >0.92</span
+                                        >
+                                    </p>
+                                    <input
+                                        id="physics-restitution"
+                                        type="range"
+                                        min="0.01"
+                                        max="0.99"
+                                        step="0.01"
+                                        value="0.92"
+                                    />
+                                </label>
+                                <label>
+                                    Vzdušné trenie
+                                    <p>
+                                        Hodnota:
+                                        <span id="physics-friction-air-value"
+                                            >0.02</span
+                                        >
+                                    </p>
+                                    <input
+                                        id="physics-friction-air"
+                                        type="range"
+                                        min="0.01"
+                                        max="0.99"
+                                        step="0.01"
+                                        value="0.02"
+                                    />
+                                </label>
+                                <label>
+                                    Trenie po povrchu
+                                    <p>
+                                        Hodnota:
+                                        <span id="physics-friction-value"
+                                            >0.001</span
+                                        >
+                                    </p>
+                                    <input
+                                        id="physics-friction"
+                                        type="range"
+                                        min="0.001"
+                                        max="0.09"
+                                        step="0.001"
+                                        value="0.001"
+                                    />
+                                </label>
+                                <label>
+                                    Statické trenie
+                                    <p>
+                                        Hodnota:
+                                        <span id="physics-friction-static-value"
+                                            >0.2</span
+                                        >
+                                    </p>
+                                    <input
+                                        id="physics-friction-static"
+                                        type="range"
+                                        min="0.01"
+                                        max="0.99"
+                                        step="0.01"
+                                        value="0.2"
+                                    />
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="config-footer">
+                        <button
+                            id="confirm-settings-button"
+                            type="button"
+                            class="primary"
+                        >
+                            Potvrdiť parametre a spustiť hru
+                        </button>
+                        <button id="config-back-button" type="button">
+                            Späť do menu
+                        </button>
+                    </div>
+                    <p
+                        class="config-confirm-message"
+                        id="config-confirm-message"
+                        hidden
+                    ></p>
+                </div>
+            </div>
+            <div class="status-board">
+                <div class="status-list">
+                    <p>
+                        <span class="status-color status-color-a"></span>
+                        Hráč <span id="status-player-a-name"></span>:
+                        <span class="status-value" id="stones-count-a">0</span>
+                    </p>
+                    <p>
+                        <span class="status-color status-color-b"></span>
+                        Hráč <span id="status-player-b-name"></span>:
+                        <span class="status-value" id="stones-count-b">0</span>
+                    </p>
+                    <p>
+                        <span class="status-title">Na ťahu:</span>
+                        <span class="status-value" id="turn-indicator"></span>
+                    </p>
+                    <p class="status-message" id="status-message">
+                        Čaká sa na hráča.
+                    </p>
+                    <p class="status-result" id="status-result">
+                        Víťaz zatiaľ nie je.
+                    </p>
+                </div>
+                <div class="status-controls">
+                    <button id="pause-button" type="button">Pauza</button>
+                </div>
+            </div>
+            <main class="canvas-wrapper">
+                <canvas id="gameCanvas"></canvas>
+            </main>
+        </div>
+        <script type="module" src="/src/settings.js"></script>
+        <script type="module" src="/src/main.js"></script>
+    </body>
+</html>

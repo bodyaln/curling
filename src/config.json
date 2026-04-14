@@ -1,0 +1,29 @@
+{
+    "field": {
+        "width": 1000,
+        "height": 350
+    },
+    "target": {
+        "x": 500,
+        "y": 200,
+        "radius": 70
+    },
+    "stonesPerPlayer": 2,
+    "colors": {
+        "playerA": "#ffffff",
+        "playerB": "#5d9cec"
+    },
+    "firstPlayer": "A",
+    "stone": {
+        "radius": 16,
+        "baseX": 120,
+        "rowY": 180,
+        "powerMultiplier": 16
+    },
+    "physics": {
+        "restitution": 0.92,
+        "frictionAir": 0.02,
+        "friction": 0.001,
+        "frictionStatic": 0.2
+    }
+}
