@@ -293,6 +293,17 @@ function updatePlayerLabels(event) {
     }
 }
 
+function getPlayerNameByRole(role) {
+    const names = getPlayerNames() || playerNames;
+    if (role === "A") return names.A || playerAName;
+    if (role === "B") return names.B || playerBName;
+    return "";
+}
+
+function getOpponentRole(role) {
+    return role === "A" ? "B" : "A";
+}
+
 function validateConfig(config) {
     if (!config || typeof config !== "object") return false;
     const hasValidControls = getConfigControls().every((control) => {
@@ -421,10 +432,12 @@ function handleSocketMessage(event) {
     }
 
     if (payload.type === "roomReady") {
-        selfPlayerName = payload.selfName || "";
-        opponentPlayerName = payload.opponentName || "";
         playerAName = payload.playerAName || "";
         playerBName = payload.playerBName || "";
+        selfPlayerName = getPlayerNameByRole(payload.selfRole);
+        opponentPlayerName = getPlayerNameByRole(
+            payload.opponentRole || getOpponentRole(payload.selfRole),
+        );
         localConfirmed = false;
         updatePlayerLabels();
         hideConfirmMessage();
